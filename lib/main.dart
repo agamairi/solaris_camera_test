@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:typed_data';
+// import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:web_socket_channel/io.dart';
@@ -133,8 +133,9 @@ class _CameraScreenState extends State<CameraScreen> {
           children: <Widget>[
             FloatingActionButton(
               onPressed: switchCamera,
-              child: Icon(Icons.switch_camera),
-              heroTag: null, // Required for multiple FABs
+              heroTag: null,
+              child:
+                  const Icon(Icons.switch_camera), // Required for multiple FABs
             ),
             FloatingActionButton(
               onPressed: () {
