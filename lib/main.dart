@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:image/image.dart' as img;
 
 // List of available cameras
 late List<CameraDescription> cameras;
@@ -47,7 +48,7 @@ class _CameraScreenState extends State<CameraScreen> {
   void initState() {
     super.initState();
     controller =
-        CameraController(cameras[selectedCameraIndex], ResolutionPreset.medium);
+        CameraController(cameras[selectedCameraIndex], ResolutionPreset.low);
     controller.initialize().then((_) {
       if (!mounted) return;
       setState(() {});
@@ -69,13 +70,25 @@ class _CameraScreenState extends State<CameraScreen> {
     super.dispose();
   }
 
-  Future<void> sendFrame(CameraImage img) async {
+  Future<void> sendFrame(CameraImage image) async {
     try {
-      Uint8List bytes = Uint8List.fromList(
-          img.planes[0].bytes); // Get the byte data from the CameraImage
-      String encoded =
-          base64Encode(bytes); // Encode the byte data as a base64 string
-      channel.sink.add(encoded); // Send the encoded data through the WebSocket
+      final img.Image rgbaImage = img.Image(
+          width: image.width, height: image.height); // Create empty image
+
+      for (int y = 0; y < image.height; y++) {
+        for (int x = 0; x < image.width; x++) {
+          final int pixel =
+              image.planes[0].bytes[y * image.width + x]; // Get pixel value
+          final int r = (pixel >> 16) & 0xFF;
+          final int g = (pixel >> 8) & 0xFF;
+          final int b = pixel & 0xFF;
+          rgbaImage.setPixelRgba(x, y, r, g, b, 255); // Set pixel color
+        }
+      }
+
+      final List<int> png = img.encodePng(rgbaImage);
+      final String encoded = base64Encode(png);
+      channel.sink.add(encoded);
     } catch (e) {
       print('Error: ${e.toString()}');
     }
@@ -86,7 +99,7 @@ class _CameraScreenState extends State<CameraScreen> {
         ? selectedCameraIndex + 1
         : 0; // Switch to the next camera
     CameraController newController =
-        CameraController(cameras[selectedCameraIndex], ResolutionPreset.medium);
+        CameraController(cameras[selectedCameraIndex], ResolutionPreset.low);
     newController.initialize().then((_) {
       if (!mounted) return;
       setState(() {
