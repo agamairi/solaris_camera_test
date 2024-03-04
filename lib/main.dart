@@ -56,8 +56,9 @@ class _CameraScreenState extends State<CameraScreen> {
       print('Error: ${error.toString()}');
     });
     try {
+      // TODO: Always change your IP according to your network
       channel = IOWebSocketChannel.connect(
-          'ws://192.168.50.99:8080'); // Connect to the WebSocket server
+          'ws://192.168.1.223:8080'); // Connect to the WebSocket server
     } catch (e) {
       print('Error: ${e.toString()}');
     }
