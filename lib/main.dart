@@ -1,5 +1,4 @@
 import 'dart:convert';
-// import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:web_socket_channel/io.dart';
@@ -15,10 +14,12 @@ void main() async {
   } catch (e) {
     print('Error: ${e.toString()}');
   }
-  runApp(CameraApp());
+  runApp(const CameraApp());
 }
 
 class CameraApp extends StatelessWidget {
+  const CameraApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -82,7 +83,7 @@ class _CameraScreenState extends State<CameraScreen> {
               image.planes[0].bytes[y * image.width + x]; // Get pixel value
           final int r = (pixel >> 16) & 0xFF;
           final int g = (pixel >> 8) & 0xFF;
-          final int b = pixel & 0xFF;
+          final int b = (pixel) & 0xFF;
           rgbaImage.setPixelRgba(x, y, r, g, b, 255); // Set pixel color
         }
       }
